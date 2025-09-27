@@ -1,0 +1,63 @@
+const express = require("express");
+const router = express.Router();
+const wrapAsync = require("../utils/wrapAsync.js");
+const ExpressError = require("../utils/ExpressError.js");
+const Listing = require("../Models/listing.js");
+const { isLoggedIn, isOwner, validateListing } = require("../middleware.js");
+const listingController = require("../controllers/listings.js");
+const multer = require("multer");
+const {storage}=require("../cloudconfig.js");
+const upload = multer({ storage });
+
+router.route("/")
+    .get(wrapAsync(listingController.index))
+    .post(isLoggedIn,upload.single("listing[image]"),validateListing,
+    wrapAsync(listingController.createListing)
+    );
+//create route
+router.get("/new", isLoggedIn, (req, res) => {
+    res.render("Listings/new.ejs");
+});
+//search box
+router.get("/search",async (req,res)=>{
+    const query =req.query.q;
+    if (!query) return res.redirect("/listings");
+     const listings = await Listing.find({
+        $or:[
+            {title :{$regex :query,$options:"i"}},
+            {location:{$regex:query,$options:"i"}},
+        ],
+    });
+    res.render("listings/index",{allListings: listings});
+
+});
+router.get("/search/suggestions",async(req,res)=>{
+    const query =req.query.q;
+    if (!query) {
+        return res.json([]);
+    }
+ 
+    const listings = await Listing.find({
+        $or:[
+            {title :{$regex :query,$options:"i"}},
+            {location:{$regex:query,$options:"i"}},
+        ],
+    }).limit(5);
+
+    const suggestions = listings.map(I=>({
+        title:I.title,
+        location:I.title,
+    }));
+    res.json(suggestions);
+});
+
+router.route("/:id")
+    .get(wrapAsync(listingController.showListing))
+    .put(isLoggedIn, isOwner,upload.single("listing[image]"),validateListing, wrapAsync(listingController.updateListing))
+    .delete(isLoggedIn, isOwner, wrapAsync(listingController.destroyListing));
+    
+
+//EDIT route
+router.get("/:id/edit", isLoggedIn, isOwner, wrapAsync(listingController.renderEditForm));
+
+module.exports = router;
