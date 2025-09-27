@@ -22,13 +22,13 @@ router.get("/new", isLoggedIn, (req, res) => {
 router.get("/search",async (req,res)=>{
     const query =req.query.q;
     if (!query) return res.redirect("/listings");
-     const listings = await Listing.find({
+     const allListings = await Listing.find({
         $or:[
             {title :{$regex :query,$options:"i"}},
             {location:{$regex:query,$options:"i"}},
         ],
     });
-    res.render("listings/index",{allListings: listings});
+    res.render("listings/index",{allListings});
 
 });
 router.get("/search/suggestions",async(req,res)=>{

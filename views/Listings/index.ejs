@@ -1,8 +1,14 @@
 <% layout("/layouts/boilerplate") %>
+    <div id="listings-data" data-listings='<%- JSON.stringify(allListings) %>'> </div>
     <script>
-        const allListings =<% -JSON.stringify(listings) %>;
-        console.log(allListings);
-    </script>
+  // Grab JSON from data attribute
+  const listingsData = document.getElementById("listings-data").dataset.listings;
+
+  // Convert back into JS object/array
+  const allListings = JSON.parse(listingsData);
+
+  console.log(allListings); // ✅ Now works
+</script>
     <style>
         #filters {
             display: flex;
