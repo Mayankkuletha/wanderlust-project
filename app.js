@@ -21,6 +21,7 @@ const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
 const userRouter=require("./routes/user.js");
 let port = 8080;
+// const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
 const dbUrl=process.env.ATLASDB_URL;
 main().then(()=>{
     console.log("connection sucessfull");
@@ -95,7 +96,7 @@ app.use("/",userRouter);
 
 //error handler
 app.all(/.*/,(req,res,next)=>{
-    next(new ExpressError(404,"Page not found!!"));
+    next(new ExpressError(404,"Page not found!!"))
 });
 app.use((err,req,res,next)=>{
     let{statusCode=500,message="something went wrong"}=err;
