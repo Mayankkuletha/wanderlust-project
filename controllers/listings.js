@@ -8,7 +8,7 @@ module.exports.index=async (req,res)=>{
     res.render("Listings/index.ejs",{allListings});
 };
 
-
+//listing
 module.exports.createListing=async (req,res,next)=>{
    let response= await geocodingClient.forwardGeocode({
   query: req.body.listing.location,
